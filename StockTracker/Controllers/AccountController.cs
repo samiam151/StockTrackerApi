@@ -19,23 +19,48 @@ namespace StockTracker.Controllers
     using Microsoft.IdentityModel.Tokens;
     using global::StockTracker.Services;
     using global::StockTracker.Configs;
+    using Microsoft.EntityFrameworkCore;
+    using global::StockTracker.Models;
+    using global::StockTracker.Extensions;
 
     namespace StockTracker.Controllers
     {
+
         [ApiController]
         [Authorize]
         [Route("api/[controller]")]
         public class AccountController : ControllerBase
         {
+            private DbSet<User> _users;
             private readonly ILogger<AccountController> _logger;
             private readonly IUserService _userService;
             private readonly IJwtAuthManager _jwtAuthManager;
 
-            public AccountController(ILogger<AccountController> logger, IUserService userService, IJwtAuthManager jwtAuthManager)
+            public AccountController(ILogger<AccountController> logger, IUserService userService, IJwtAuthManager jwtAuthManager, DbContext context)
             {
                 _logger = logger;
                 _userService = userService;
                 _jwtAuthManager = jwtAuthManager;
+                _users = context.ResolveDbSet<User>() as DbSet<User>;
+            }
+
+            [AllowAnonymous]
+            [HttpPost("signup")]
+            public ActionResult SignUp([FromBody] LoginRequest request)
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest();
+                }
+                if (_userService.IsValidUserCredentials(request.UserName, request.Password))
+                {
+                    return BadRequest("User already exists.");
+                }
+
+                User newUser = _userService.AddUser(request.UserName, request.Password);
+                _users.Add(newUser);
+
+                return Ok(newUser);
             }
 
             [AllowAnonymous]
@@ -61,12 +86,17 @@ namespace StockTracker.Controllers
 
                 var jwtResult = _jwtAuthManager.GenerateTokens(request.UserName, claims, DateTime.Now);
                 _logger.LogInformation($"User [{request.UserName}] logged in the system.");
-                return Ok(new LoginResult
+
+                var user = _users.Where(user => user.email == request.UserName).FirstOrDefault();
+                return Ok(new UserDTO
                 {
                     UserName = request.UserName,
                     Role = role,
                     AccessToken = jwtResult.AccessToken,
-                    RefreshToken = jwtResult.RefreshToken.TokenString
+                    RefreshToken = jwtResult.RefreshToken.TokenString,
+                    Id = user.Id,
+                    Email = user.email,
+                    Watchlist = user.Watchlist
                 });
             }
 

@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using StockTracker.Configs;
 using StockTracker.Models;
+using StockTracker.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,6 +32,13 @@ namespace StockTracker
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(
+                    builder => builder.WithOrigins("http://localhost:4200"));
+            });
+
+
             var jwtTokenConfig = Configuration.GetSection("jwtTokenConfig").Get<JwtTokenConfig>();
             services.AddSingleton(jwtTokenConfig);
             services.AddAuthentication(x =>
@@ -54,20 +62,10 @@ namespace StockTracker
                 };
             });
 
-            services.AddCors(options =>
-            {
-                options.AddDefaultPolicy(
-                    builder =>
-                    {
-                        // builder.WithOrigins("localhost:4200");
-                        builder.AllowAnyOrigin()
-                            .AllowAnyHeader()
-                            .AllowAnyMethod();
-                    });
-            });
-
             services.AddControllers();
             services.AddScoped<DbContext, Context>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IJwtAuthManager, JwtAuthManager>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -77,12 +75,12 @@ namespace StockTracker
             {
                 app.UseDeveloperExceptionPage();
             }
-            
-            app.UseHttpsRedirection();
-
-            app.UseRouting();
 
             app.UseCors();
+            
+            // app.UseHttpsRedirection();
+
+            app.UseRouting();
 
             app.UseAuthentication();
 

@@ -8,6 +8,9 @@ namespace StockTracker.Models
 {
     public class Context: DbContext
     {
+        public DbSet<StockSymbol> StockSymbols { get; set; }
+        public DbSet<User> Users { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
             options.UseNpgsql("Host=localhost;Database=stock-tracker;Username=postgres;Password=root");
@@ -28,6 +31,5 @@ namespace StockTracker.Models
             builder.Entity<StockSymbol>().HasData(StockSymbol.GetSeedData());
         }
 
-        public DbSet<StockSymbol> StockSymbols { get; set; }
     }
 }
