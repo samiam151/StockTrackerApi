@@ -10,7 +10,7 @@ namespace StockTracker.Models
     {
         public int Id { get; set; }
         public string Email { get; set; }
-        public ICollection<StockSymbol> Watchlist { get; set; }
+        public ICollection<UserWatchlist> Watchlist { get; set; }
 
     }
 }

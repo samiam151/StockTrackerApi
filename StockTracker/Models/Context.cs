@@ -10,6 +10,7 @@ namespace StockTracker.Models
     {
         public DbSet<StockSymbol> StockSymbols { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<UserWatchlist> Watchlists { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
@@ -24,6 +25,16 @@ namespace StockTracker.Models
 
         private void ConfigureRelationships(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<UserWatchlist>()
+                .HasKey(wl => new { wl.UserId, wl.SymbolId });
+            modelBuilder.Entity<UserWatchlist>()
+                .HasOne(bc => bc.User)
+                .WithMany(b => b.Watchlist)
+                .HasForeignKey(bc => bc.UserId);
+            modelBuilder.Entity<UserWatchlist>()
+                .HasOne(bc => bc.Symbol)
+                .WithMany(c => c.Watchlist)
+                .HasForeignKey(bc => bc.SymbolId);
         }
 
         private void SeedData(ModelBuilder builder)

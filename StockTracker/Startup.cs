@@ -34,10 +34,11 @@ namespace StockTracker
         {
             services.AddCors(options =>
             {
+                //options.AddDefaultPolicy(
+                //    builder => builder.WithOrigins("http://localhost:4200"));
                 options.AddDefaultPolicy(
-                    builder => builder.WithOrigins("http://localhost:4200"));
+                    builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
             });
-
 
             var jwtTokenConfig = Configuration.GetSection("jwtTokenConfig").Get<JwtTokenConfig>();
             services.AddSingleton(jwtTokenConfig);

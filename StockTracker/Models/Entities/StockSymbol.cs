@@ -8,7 +8,18 @@ namespace StockTracker.Models
 {
     public class StockSymbol : ReferenceData
     {
+        public StockSymbol()
+        {
+            Watchlist = new HashSet<UserWatchlist>();
+        }
+
         public string Symbol { get; set; }
+
+        public IEnumerable<UserWatchlist> Watchlist { get; set; }
+
+
+
+
 
         public static IEnumerable<StockSymbol> GetSeedData()
         {

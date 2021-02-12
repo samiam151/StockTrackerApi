@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StockTracker.Controllers.Base;
 using StockTracker.Models;
@@ -16,6 +17,7 @@ namespace StockTracker.Controllers
         }
         
         [HttpGet]
+        [Authorize]
         [Route("search")]
         public ActionResult SearchSymbols(string term)
         {

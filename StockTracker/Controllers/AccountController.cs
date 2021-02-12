@@ -60,7 +60,12 @@ namespace StockTracker.Controllers
                 User newUser = _userService.AddUser(request.UserName, request.Password);
                 _users.Add(newUser);
 
-                return Ok(newUser);
+
+                return Ok(new UserDTO
+                {
+                    Email = newUser.email,
+                    Id = newUser.Id
+                });
             }
 
             [AllowAnonymous]
@@ -76,18 +81,19 @@ namespace StockTracker.Controllers
                 {
                     return Unauthorized();
                 }
+                var user = _users.Where(user => user.email == request.UserName).FirstOrDefault();
 
                 var role = _userService.GetUserRole(request.UserName);
                 var claims = new[]
                 {
-                new Claim(ClaimTypes.Name,request.UserName),
-                new Claim(ClaimTypes.Role, role)
-            };
+                    new Claim("name", request.UserName),
+                    new Claim("role", role),
+                    new Claim("user_id", user.Id.ToString())
+                };
 
                 var jwtResult = _jwtAuthManager.GenerateTokens(request.UserName, claims, DateTime.Now);
                 _logger.LogInformation($"User [{request.UserName}] logged in the system.");
 
-                var user = _users.Where(user => user.email == request.UserName).FirstOrDefault();
                 return Ok(new UserDTO
                 {
                     UserName = request.UserName,
