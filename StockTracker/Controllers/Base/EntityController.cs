@@ -27,7 +27,7 @@ namespace StockTracker.Controllers.Base
         public IActionResult GetAllEntities()
         {
             var query = dbSet.AsQueryable();
-            var result = query.IncludeAll<T>(typeof(T));
+            var result = query.IncludeAll<T>();
             return Ok(result.ToList());
         }
 
@@ -36,7 +36,7 @@ namespace StockTracker.Controllers.Base
         public IActionResult GetEntity(int id)
         {
             var query = dbSet.AsQueryable();
-            T result = query.FirstOrDefault(e => e.Id == id);
+            T result = query.IncludeAll<T>().FirstOrDefault(e => e.Id == id);
             return Ok(result);
         }
 

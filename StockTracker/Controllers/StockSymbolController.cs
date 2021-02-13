@@ -17,7 +17,6 @@ namespace StockTracker.Controllers
         }
         
         [HttpGet]
-        [Authorize]
         [Route("search")]
         public ActionResult SearchSymbols(string term)
         {
@@ -25,7 +24,7 @@ namespace StockTracker.Controllers
             {
                 return BadRequest();
             }
-            return Ok(dbSet.Where(sym => sym.Name.Contains(term) || sym.Symbol.Contains(term)));
+            return Ok(dbSet.Where(sym => sym.Name.Contains(term.ToUpper()) || sym.Symbol.Contains(term.ToUpper())));
         }
     }
 }

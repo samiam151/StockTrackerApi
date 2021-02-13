@@ -7,7 +7,14 @@ using System.Threading.Tasks;
 
 namespace StockTracker.Models.Base
 {
-    public class Entity
+    public interface IEntity
+    {
+        DateTime? CreatedAt { get; set; }
+        int Id { get; set; }
+        DateTime? UpdatedAt { get; set; }
+    }
+
+    public class Entity : IEntity
     {
         [Key]
         public int Id { get; set; }

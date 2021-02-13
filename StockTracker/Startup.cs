@@ -32,22 +32,25 @@ namespace StockTracker
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // Add CORS settings
             services.AddCors(options =>
             {
-                //options.AddDefaultPolicy(
-                //    builder => builder.WithOrigins("http://localhost:4200"));
                 options.AddDefaultPolicy(
-                    builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+                    builder => builder
+                        .AllowAnyOrigin()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                    );
             });
 
+            // Add JWT Auth settings
             var jwtTokenConfig = Configuration.GetSection("jwtTokenConfig").Get<JwtTokenConfig>();
             services.AddSingleton(jwtTokenConfig);
             services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(x =>
-            {
+            }).AddJwtBearer(x => {
                 x.RequireHttpsMetadata = true;
                 x.SaveToken = true;
                 x.TokenValidationParameters = new TokenValidationParameters
@@ -63,7 +66,10 @@ namespace StockTracker
                 };
             });
 
-            services.AddControllers();
+            // Add Controller settings
+            services.AddControllers().AddNewtonsoftJson(x => x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore); ;
+            
+            // Add Services for IoC
             services.AddScoped<DbContext, Context>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IJwtAuthManager, JwtAuthManager>();
