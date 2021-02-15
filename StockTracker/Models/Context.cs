@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace StockTracker.Models
@@ -37,7 +38,7 @@ namespace StockTracker.Models
                 .HasForeignKey(bc => bc.SymbolId);
         }
 
-        private void SeedData(ModelBuilder builder)
+        private async void SeedData(ModelBuilder builder)
         {
             builder.Entity<StockSymbol>().HasData(StockSymbol.GetSeedData());
         }

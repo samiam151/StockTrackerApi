@@ -14,5 +14,12 @@ namespace StockTracker.Controllers
         public UsersController(DbContext context) : base(context)
         {
         }
+
+        [HttpGet]
+        [Route("search")]
+        public IActionResult Search(string email)
+        {
+            return Ok(dbSet.Where(u => u.email == email));
+        }
     }
 }
